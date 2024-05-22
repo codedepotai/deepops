@@ -16,10 +16,19 @@
       changed_when: output.stdout != ""
       when: proxy_env is defined
 
+- hosts: all
+  become: true
+  gather_facts: false
+  tasks:
+    - name: remove problematic apt sources
+      ansible.builtin.command:
+        cmd: rm /etc/apt/sources.list.d/google-cloud.list
+      args:
+        removes: /etc/apt/sources.list.d/google-cloud.list
 
 # Install necessary Python packages for future pip and setuptools requirements
 - hosts: all
-  become: true 
+  become: true
   gather_facts: true
   tasks:
     - name: force an apt update on Ubuntu
@@ -30,8 +39,8 @@
     - name: install python 3 libraries if python 3 is present
       package:
         name:
-        - python3-setuptools
-        - python3-pip
+          - python3-setuptools
+          - python3-pip
         state: present
       when: ansible_python.version.major == 3
 
@@ -44,6 +53,6 @@
     - name: install python 2 libraries on EL7
       package:
         name:
-        - python-setuptools
-        - python-pip
+          - python-setuptools
+          - python-pip
       when: (ansible_python.version.major == 2) and (ansible_os_family == "RedHat") and (ansible_distribution_major_version == "7")
