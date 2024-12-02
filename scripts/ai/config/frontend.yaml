@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: PersistentVolumeClaim
+metadata:
+  name: frontend-db
+spec:
+  resources:
+    requests:
+      storage: 500Mi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: frontend
+  name: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - image: codedepotai/frontend_lambda_instances:lastest
+        imagePullPolicy: Always
+        name: frontend
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "500Mi"
+          requests:
+            cpu: "500m"
+            memory: "i"
+        volumeMounts:
+        - mountPath: /db
+          name: db
+      volumes:
+      - name: db
+        persistentVolumeClaim:
+          claimName: frontend-db
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: frontend
+  type: NodePort
