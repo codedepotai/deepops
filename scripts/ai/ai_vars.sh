@@ -1,2 +1,2 @@
-FRONTEND_NAMESPACE="ai-frontend"
-CLUSTER_NAME="ai-cluster"
+CODEDEPOT_FRONTEND_NAMESPACE="ai-frontend"
+CODEDEPOT_CLUSTER_NAME="ai-cluster"

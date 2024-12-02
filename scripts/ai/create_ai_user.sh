@@ -14,12 +14,15 @@ openssl x509 -req -in admin-user.csr \
     -out admin-user.crt \
     -days 365
 
-# Creates cubeconfig for admin user
-kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
+# Update certificate with CODEDEPOT_API_HOST_IP
+sudo rm /etc/kubernetes/pki/apiserver.crt
+sudo rm /etc/kubernetes/pki/apiserver.key
 
+sudo kubeadm init phase certs apiserver --apiserver-cert-extra-sans $CODEDEPOT_API_HOST_IP
 
-kubectl config set-cluster $CLUSTER_NAME \
-    --server=https://<API_SERVER_IP>:6443 \
+# Creates cubeconfig for admin user -> WHAT DOES THIS DO?
+kubectl config set-cluster $CODEDEPOT_CLUSTER_NAME \
+    --server=https://$CODEDEPOT_API_HOST_IP:6443 \
     --certificate-authority=/etc/kubernetes/pki/ca.crt \
     --embed-certs=true \
     --kubeconfig=admin-user.kubeconfig
@@ -30,7 +33,7 @@ kubectl config set-credentials admin-user \
     --kubeconfig=admin-user.kubeconfig
 
 kubectl config set-context admin-user-context \
-    --cluster=$CLUSTER_NAME \
+    --cluster=$CODEDEPOT_CLUSTER_NAME \
     --user=admin-user \
     --kubeconfig=admin-user.kubeconfig
 

@@ -1,10 +1,9 @@
 #! /bin/bash
 
-# Read and strip cluster_prefix from the file
-CLUSTER_PREFIX=$(cat cluster_prefix)
-ROOT_DIR="/home/ubuntu/${CLUSTER_PREFIX}"  # Root directory of DeepOps
+# Read and strip CODEDEPOT_CLUSTER_PREFIX from the file
+ROOT_DIR="/home/ubuntu/${CODEDEPOT_CLUSTER_PREFIX}"  # Root directory of DeepOps
 DEEPOPS_ROOT="${ROOT_DIR}/deepops"  # Root directory of DeepOps
-CLUSTER_CREATION_LOG="${ROOT_DIR}/${CLUSTER_PREFIX}.log"
+CLUSTER_CREATION_LOG="${ROOT_DIR}/${CODEDEPOT_CLUSTER_PREFIX}.log"
 
 # Function to log messages
 log() {
@@ -36,7 +35,7 @@ as_user() {
 
 log "Adding ssh-key to agent"
 eval `ssh-agent`
-ssh-add ~/.ssh/id_rsa.${CLUSTER_PREFIX}
+ssh-add ~/.ssh/id_rsa.${CODEDEPOT_CLUSTER_PREFIX}
 
 log "Installing dependencies"
 # Configuration
