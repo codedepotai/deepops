@@ -14,7 +14,7 @@ log() {
 # Proxy wrapper
 as_sudo(){
     cmd="sudo bash -c '$@'"
-    eval $cmd >> "$CLUSTER_CREATION_LOG" 2>&1
+    eval $cmd 2>&1 | tee -a "$CLUSTER_CREATION_LOG"
     if [ $? -ne 0 ]; then
         log "Command $cmd failed"
         echo "Command $cmd failed"
@@ -25,7 +25,7 @@ as_sudo(){
 # Function to run a command as a user and log output
 as_user() {
     cmd="bash -c '$@'"
-    eval $cmd >> "$CLUSTER_CREATION_LOG" 2>&1
+    eval $cmd 2>&1 | tee -a "$CLUSTER_CREATION_LOG"
     if [ $? -ne 0 ]; then
         log "Command $cmd failed"
         echo "Command $cmd failed"
@@ -99,10 +99,15 @@ ansible localhost -m lineinfile -a "path=$HOME/.bashrc create=yes mode=0644 back
 
 # Replace config/inventory and config/group_vars/k8s-cluster.yaml with ../inventory and ../k8s-cluster.yaml
 log "Copying inventory and group_vars"
-rm config/inventory
-rm config/group_vars/k8s-cluster.yml
-as_user python script/ai/config.py config/inventory
-cp ai/config/k8s-cluster.yml config/group_vars/k8s-cluster.yml
+# Removes the existing inventory and group_vars/k8s-cluster.yml, don't error if they don't exist
+rm -rf config/inventory
+rm -rf config/group_vars/k8s-cluster.yml
+
+# Setup new inventory and k8s-cluster.yml files
+as_user python scripts/ai/config.py config/inventory
+cp scripts/ai/config/k8s-cluster.yml config/group_vars/k8s-cluster.yml
+
+# Run the playbook
 log "Checking ansible with nodes"
 as_user ansible all -m raw -a "hostname"
 log "Running ansible playbook"
@@ -115,10 +120,10 @@ as_user kubectl get nodes
 log "Deploying kubeflow"
 as_user ./scripts/k8s/deploy_kubeflow.sh
 
-#log "Starting Cluster Frontend Service"
+# log "Starting Cluster Frontend Service"
 # as_user ./scripts/ai/deploy_frontend.sh
 
-log "Creating user keys"
-as_user ./scripts/ai/create_ai_user.sh
+# log "Creating user keys"
+# as_user ./scripts/ai/create_ai_user.sh
 
 log "Cluster setup complete"

@@ -1,7 +1,7 @@
 import os 
 import sys
 
-def ansible_inventory(self, host: str, workers: list[str]) -> str:
+def ansible_inventory(host: str, workers: list[str]) -> str:
     # mgmt01  ansible_host=192.18.138.177
     # gpu01   ansible_host=146.235.207.25
 
