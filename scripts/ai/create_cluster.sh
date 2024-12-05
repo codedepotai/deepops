@@ -123,7 +123,7 @@ as_user ./scripts/k8s/deploy_kubeflow.sh
 # log "Starting Cluster Frontend Service"
 # as_user ./scripts/ai/deploy_frontend.sh
 
-# log "Creating user keys"
-# as_user ./scripts/ai/create_ai_user.sh
+log "Creating user keys"
+as_user ./scripts/ai/create_ai_user.sh
 
 log "Cluster setup complete"
